@@ -10,6 +10,7 @@ import * as HTMLRenderers from './HTMLRenderers';
 
 export default class HTML extends PureComponent {
     static propTypes = {
+        allowFontScaling: PropTypes.bool,
         renderers: PropTypes.object.isRequired,
         ignoredTags: PropTypes.array.isRequired,
         ignoredStyles: PropTypes.array.isRequired,
@@ -38,6 +39,7 @@ export default class HTML extends PureComponent {
     }
 
     static defaultProps = {
+        allowFontScaling: true,
         renderers: HTMLRenderers,
         debug: false,
         decodeEntities: true,
@@ -436,7 +438,7 @@ export default class HTML extends PureComponent {
 
             const classStyles = _getElementClassStyles(attribs, classesStyles);
             const textElement = data ?
-                <Text style={this.filterBaseFontStyles(element, classStyles)}>{ data }</Text> :
+                <Text allowFontScaling={this.props.allowFontScaling} style={this.filterBaseFontStyles(element, classStyles)}>{ data }</Text> :
                 false;
 
             const style = [
