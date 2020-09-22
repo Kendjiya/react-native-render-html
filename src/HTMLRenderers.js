@@ -1,7 +1,8 @@
 import React from 'react';
-import { TouchableOpacity, Text, View, WebView, Dimensions } from 'react-native';
+import { TouchableOpacity, Text, View, Dimensions } from 'react-native';
 import { _constructStyles } from './HTMLStyles';
 import HTMLImage from './HTMLImage';
+import { WebView } from 'react-native-webview';
 
 export function a (htmlAttribs, children, convertedCSSStyles, passProps) {
     const { parentWrapper, onLinkPress, key, data } = passProps;
