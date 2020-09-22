@@ -5,12 +5,7 @@ const ViewStylePropTypes = ['display', 'width', 'height', 'start', 'end', 'top',
 const TextStylePropTypes = ['display', 'width', 'height', 'start', 'end', 'top', 'left', 'right', 'bottom', 'minWidth', 'maxWidth', 'minHeight', 'maxHeight', 'margin', 'marginVertical', 'marginHorizontal', 'marginTop', 'marginBottom', 'marginLeft', 'marginRight', 'marginStart', 'marginEnd', 'padding', 'paddingVertical', 'paddingHorizontal', 'paddingTop', 'paddingBottom', 'paddingLeft', 'paddingRight', 'paddingStart', 'paddingEnd', 'borderWidth', 'borderTopWidth', 'borderStartWidth', 'borderEndWidth', 'borderRightWidth', 'borderBottomWidth', 'borderLeftWidth', 'position', 'flexDirection', 'flexWrap', 'justifyContent', 'alignItems', 'alignSelf', 'alignContent', 'overflow', 'flex', 'flexGrow', 'flexShrink', 'flexBasis', 'aspectRatio', 'zIndex', 'direction', 'shadowColor', 'shadowOffset', 'shadowOpacity', 'shadowRadius', 'transform', 'transformMatrix', 'decomposedMatrix', 'scaleX', 'scaleY', 'rotation', 'translateX', 'translateY', 'backfaceVisibility', 'backgroundColor', 'borderColor', 'borderTopColor', 'borderRightColor', 'borderBottomColor', 'borderLeftColor', 'borderStartColor', 'borderEndColor', 'borderRadius', 'borderTopLeftRadius', 'borderTopRightRadius', 'borderTopStartRadius', 'borderTopEndRadius', 'borderBottomLeftRadius', 'borderBottomRightRadius', 'borderBottomStartRadius', 'borderBottomEndRadius', 'borderStyle', 'opacity', 'elevation', 'color', 'fontFamily', 'fontSize', 'fontStyle', 'fontWeight', 'fontVariant', 'textShadowOffset', 'textShadowRadius', 'textShadowColor', 'letterSpacing', 'lineHeight', 'textAlign', 'textAlignVertical', 'includeFontPadding', 'textDecorationLine', 'textDecorationStyle', 'textDecorationColor', 'textTransform', 'writingDirection']
 
 // Filter prop-types that are only applicable to <Text> and not <View>
-export let TextOnlyPropTypes = {};
-Object.keys(TextStylesPropTypes).forEach((prop) => {
-    if (!ViewStylesPropTypes[prop]) {
-        TextOnlyPropTypes[prop] = TextStylesPropTypes[prop];
-    }
-});
+export const TextOnlyPropTypes = TextStylePropTypes.filter((prop) => ViewStylePropTypes.indexOf(prop) === -1);
 
 // These tags should ALWAYS be mapped to View wrappers
 export const BLOCK_TAGS = ['address', 'article', 'aside', 'footer', 'hgroup', 'nav', 'section', 'blockquote', 'dd',
@@ -41,37 +36,26 @@ export const PERC_SUPPORTED_STYLES = [
     'padding', 'paddingBottom', 'paddingTop', 'paddingLeft', 'paddingRight', 'paddingHorizontal', 'paddingVertical'
 ];
 
-// We have to do some munging here as the objects are wrapped
-const RNTextStylePropTypes = Object.keys(TextStylesPropTypes)
-    .reduce((acc, k) => { acc[k] = TextStylesPropTypes[k]; return acc; }, {});
-const RNViewStylePropTypes = Object.keys(ViewStylesPropTypes)
-    .reduce((acc, k) => { acc[k] = ViewStylesPropTypes[k]; return acc; }, {});
-const RNImageStylePropTypes = Object.keys(ImageStylesPropTypes)
-    .reduce((acc, k) => { acc[k] = ImageStylesPropTypes[k]; return acc; }, {});
-
 export const STYLESETS = Object.freeze({ VIEW: 'view', TEXT: 'text', IMAGE: 'image' });
-
-export const stylePropTypes = {};
-stylePropTypes[STYLESETS.VIEW] = Object.assign({}, RNViewStylePropTypes);
-stylePropTypes[STYLESETS.TEXT] = Object.assign({}, RNViewStylePropTypes, RNTextStylePropTypes);
-stylePropTypes[STYLESETS.IMAGE] = Object.assign({}, RNViewStylePropTypes, RNImageStylePropTypes);
+export const stylePropTypes = {
+    [STYLESETS.VIEW]: ViewStylePropTypes,
+    [STYLESETS.TEXT]: TextStylePropTypes,
+    [STYLESETS.IMAGE]: ImageStylePropTypes
+};
 
 /**
- * Returns an array with the tagname of every parent of a node.
- * Returns an empty array if nothing is found.
+ * Returns the closest parent of a node with a specific tag.
  * @export
- * @param {any} parent a parsed HTML node, from alterChildren for example
- * @param {any} tags you don't need to supply this yourself
- * @returns {array}
+ * @param {any} node
+ * @param {string} tag
+ * @returns {HTMLNode?}
  */
-export function getParentsTagsRecursively (parent, tags = []) {
-    if (!parent) {
-        return tags;
+export function getClosestNodeParentByTag (node, tag) {
+    if (!node || !node.parent) {
+        return undefined;
     }
-    parent.name && tags.push(parent.name);
-    if (parent.parent) {
-        return getParentsTagsRecursively(parent.parent, tags);
-    } else {
-        return tags;
+    if (node.parent.name === tag) {
+        return node.parent;
     }
+    return getClosestNodeParentByTag(node.parent, tag);
 }
